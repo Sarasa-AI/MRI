@@ -1,48 +1,40 @@
 # Roadmap
 
-## Next 7 Days
+## Immediate (this week) — RSNA P0
+
+1. Package this repo / `src` as a private Kaggle Dataset for notebook import.
+2. (Optional same session) Run `01_metadata_audit.py` for authoritative gold counts.
+3. Run `notebooks/kaggle/02_train_baseline.ipynb` on **Kaggle GPU** → fill
+   `experiments/reports/RSNA-BASELINE-001.md` with OOF metrics.
+4. Next science: `RSNA-LABELS-001` (report pseudo-labels, training-time only).
+
+## Next 7 Days (supersedes 2026-08-20 list for RSNA)
+
+Historical 7-day list (2026-08-20) retained for audit trail:
 
 1. Security: rotate/revoke the exposed Anthropic key and replace plaintext
-   credentials; verify approval mode.
-2. RSNA: identify the official competition and run a metadata-only probe that
-   records files, IDs, pagination behavior, estimated bytes, API calls, and
-   failure/resume behavior. No bulk download.
+   credentials; verify approval mode. *(still open)*
+2. RSNA: identify the official competition and run a metadata-only probe…
+   → **DONE / PARTIAL** via `RSNA-G1-KAGGLE-DATA-ACCESS.md` (2026-10-02).
 3. RSNA: create the first executable imaging baseline only after the probe
-   succeeds; log it as `RSNA-BASELINE-001`.
-4. Phoenix: execute the already specified `BASELINE-001-R` control replication
-   and verify `val_qwk_full`, best/last checkpoint identity, class-wise
-   confusion, calibration, and failure invariants.
-5. Revenue: package a fixed-scope Agent Reliability Sprint, produce one proof
-   artifact from existing engineering work, and contact 10 qualified prospects.
-6. Control plane: update this repo with evidence, not status prose; each day
-   ends with three measurable next actions.
+   succeeds; log it as `RSNA-BASELINE-001`. → **PIPELINE READY** (2026-10-02);
+   Kaggle execution pending.
+4. Phoenix / Revenue items from 2026-08-20 remain valid at reduced priority
+   while competition deadline pressure is active.
 
-## 30 Days
+## 30 / 60 / 90 Days
 
-- RSNA: reproducible metadata/index pipeline, validated split/leakage audit,
-  strong 2D baseline, first submission, and an experiment registry.
-- Phoenix: one controlled imbalance/ordinal intervention at a time; report the
-  full clinical metric policy and external-source blockers.
-- Agents: secure routing matrix, read/write boundaries, experiment/evaluation
-  agents, and a regression harness used by both projects.
-- Revenue: 20-30 targeted conversations, at least 3 discovery calls, and one
-  paid or explicitly scoped pilot proposal.
+Unchanged in spirit from 2026-08-20, with these RSNA corrections:
 
-## 60 Days
+- **30 days:** study-level CV audit, strong 2.5D baseline on Kaggle, first
+  valid submission, experiment registry with OOF lineage. No local DICOM lake.
+- **60 days:** multi-plane / weak-supervision ablations only if G2 stable.
+- **90 days:** calibrated ensemble + private-LB-aware submit strategy within
+  notebooks-only constraints.
 
-- RSNA: compare 2D/2.5D/series-aware approaches only if data coverage and
-  validation are stable; maintain OOF and submission lineage.
-- Phoenix: external validation plan, uncertainty/abstention, image quality,
-  and subgroup reporting; no clinical-grade claim before these gates pass.
-- Revenue: convert the sprint into a repeatable service with case study,
-  checklist, pricing, and delivery automation.
+Late bets (GNN, CLIP report-image contrastive, from-scratch MAE) stay deferred
+until baseline + CV gates pass and compute budget remains.
 
-## 90 Days
+## Gate board
 
-- RSNA: calibrated ensemble and private-LB-aware submission strategy with
-  reproducible compute and rollback.
-- Phoenix: decision on whether the model is research-only, pilot-ready, or
-  blocked by evidence gaps.
-- Ecosystem: stable multi-agent operating system with audit logs, least
-  privilege, and human approval at money/destructive/external boundaries.
-
+See [docs/gates.md](docs/gates.md).

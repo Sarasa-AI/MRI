@@ -1,0 +1,85 @@
+# Experiment registry (summaries only — details in cards/ and results/)
+version: 1
+experiments:
+  - id: EXP-000-smoke
+    status: defined
+    config: configs/experiment/exp000_smoke.yaml
+    hypothesis: Platform smoke without DICOMs
+    next: RSNA-DATA-002 metadata audit on Kaggle
+  - id: RSNA-DATA-002
+    status: partially_ready
+    report: experiments/reports/RSNA-DATA-002.md
+    kaggle_notebook: notebooks/kaggle/kernels/rsna-data-002-metadata-audit/
+    hypothesis: >
+      Kaggle-mounted CSVs yield authoritative study/series/label stats and a
+      StudyInstanceUID GroupKFold map without DICOM decode.
+    result: >
+      Mount /kaggle/input/competitions/rsna-knee-abnormality-detection;
+      4407 studies / 24371 series / 58 gold; Report train-only; no PatientID
+      or Laterality in CSVs; fold leakage PASS with 2 rare-label zero-pos cells.
+    next: Run RSNA-BASELINE-001 on Kaggle GPU; optional StratifiedGroupKFold later
+  - id: RSNA-BASELINE-001
+    status: pipeline_ready
+    config: configs/experiment/rsna_baseline_001.yaml
+    card: experiments/cards/RSNA-BASELINE-001.md
+    report: experiments/reports/RSNA-BASELINE-001.md
+    hypothesis: >
+      EfficientNet-B0 multi-plane mid-slice 2.5D on gold labels with
+      StudyInstanceUID 5-fold CV establishes a trustworthy OOF macro-AUC floor.
+    kaggle_notebook: notebooks/kaggle/02_train_baseline.ipynb
+    next: STOP — await human approval to launch full 5-fold after DEBUG-002 PASS
+  - id: RSNA-BASELINE-001-PILOT
+    status: ready_with_caveats
+    report: experiments/reports/RSNA-BASELINE-001-PILOT.md
+    kaggle_notebook: notebooks/kaggle/kernels/rsna-baseline-001-pilot/
+    hypothesis: >
+      Existing RSNA-BASELINE-001 pipeline processes real Kaggle DICOMs on GPU
+      for 1 fold / ≤5 epochs without critical orientation/order/leakage/silent-zero failures.
+    result: >
+      DICOM decode 174/174; IPP vs InstanceNumber agreement 30/30; Tesla T4 CUDA
+      train 5 epochs; submission validator PASS; OOF all-NaN and val AUC NaN after ep0
+      → READY_WITH_CAVEATS (human override of automated READY_FOR_FULL_BASELINE).
+    next: STOP — diagnose OOF NaN before full 5-fold baseline
+  - id: RSNA-BASELINE-001-DEBUG-001
+    status: blocked_pending_fix
+    report: experiments/reports/RSNA-BASELINE-001-DEBUG-001.md
+    kaggle_notebook: notebooks/kaggle/kernels/rsna-baseline-001-debug-001/
+    hypothesis: >
+      Under frozen pilot settings, NaN first appears at one measurable stage
+      between DICOM tensors and the metric; test-vs-OOF is explained by that stage.
+    result: >
+      PRIMARY cache reload scale bug (uint8→float32 without /255 → inputs [0,255]
+      on cache hit); SECONDARY AMP fp16 all-NaN logits from epoch 1; OOF assignment
+      OK (finite-count invariant 0==0); test finite via single-pass separate cache;
+      checkpoint epoch-0 healthy. Fix proposed, not applied.
+    next: RSNA-BASELINE-001-DEBUG-002 fix validation
+  - id: RSNA-BASELINE-001-DEBUG-002
+    status: ready_for_full_baseline
+    report: experiments/reports/RSNA-BASELINE-001-DEBUG-002.md
+    kaggle_notebook: notebooks/kaggle/kernels/rsna-baseline-001-debug-002/
+    hypothesis: >
+      Correcting load_cached so uint8 dtype is preserved (enabling /255 rescale)
+      restores [0,1] validation inputs and finite AMP logits/OOF under frozen
+      pilot settings.
+    result: >
+      Single cache.py fix confirmed; epochs 0–4 unaugmented validation inputs
+      [0,1]; logits/probs/OOF finite; DICOM 174/174; Tesla T4; submission PASS;
+      best ckpt epoch 3 auc≈0.522; NEW_ISSUES NONE → READY_FOR_FULL_BASELINE.
+    next: STOP — await explicit human approval before full 5-fold baseline
+  - id: RSNA-LABELS-001
+    status: label_gate_complete
+    report: experiments/reports/RSNA-LABELS-001.md
+    card: experiments/cards/RSNA-LABELS-001.md
+    hypothesis: >
+      Offline report-derived silver labels (A–E) are high-quality enough to
+      lift gold-held-out imaging OOF without inference report dependence.
+    result: >
+      Regex extractor report→gold soft macro AUC=0.621; B–E REJECT for this
+      source; A KEEP. Imaging OOF not run on weak silver.
+    next: RSNA-LABELS-002 (stronger offline labels) then imaging OOF
+  - id: RSNA-LABELS-002
+    status: defined
+    hypothesis: >
+      Train-only LLM report labels reach report→gold macro AUC >0.80 on the
+      58 gold studies, unlocking D/E imaging OOF.
+    next: If pass → Kaggle 05_label_strategies_oof; if fail → RSNA-INPUT-001

@@ -1,0 +1,19 @@
+# Default experiment settings (merged under experiment YAMLs).
+project: rsna-knee-abnormality-detection
+seed: 42
+n_folds: 5
+group_col: StudyInstanceUID
+metric: macro_roc_auc
+runtime:
+  mode: metadata_only
+data:
+  # Never hard-code a Mac competition DICOM path.
+  # Set RSNA_DATA_ROOT or pass --data-root at runtime.
+  root: null
+  fixtures_dir: data/fixtures
+model:
+  name: ConstantPriorModel
+augmentation:
+  horizontal_flip: allow_with_compartment_swap
+  # Reports must never be an inference input.
+  report_at_inference: false

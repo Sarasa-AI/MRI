@@ -1,79 +1,103 @@
 # Project State
 
-Last verified: 2026-08-20
+Last verified: 2026-10-02
 
-## Executive State
+## Executive State (current)
 
-- Portfolio objective: maximize outcome per unit of time across RSNA, Phoenix,
-  agent capability, and near-term revenue.
-- Control-plane repo: `MRI/MRI`, Git `main`, initial commit only, clean at audit
-  start.
-- Primary execution repos: `SARASA_kaggle` and `phonix`; they are separate Git
-  worktrees and are not currently wired into this repo.
-- Biggest bottleneck: the RSNA repo has no verified knee dataset manifest,
-  DICOM acquisition index, or executable imaging baseline. The central repo is
-  also only a control plane, not a model implementation.
+- **RSNA Knee 2026 is P0.** Competition slug
+  `rsna-knee-abnormality-detection` (**VERIFIED**). Final deadline
+  **2026-10-22**; entry/merger **2026-10-15**.
+- This repo (`MRI/MRI`) is now the **Mac control plane + RSNA engineering
+  skeleton**. Competition DICOMs stay on Kaggle. No local dataset download.
+- G1 data-access probe: **PARTIAL PASS** — see
+  `RSNA-G1-KAGGLE-DATA-ACCESS.md`.
+- G1b metadata audit (**RSNA-DATA-002**): **PARTIALLY_READY** (2026-10-02) —
+  mount `/kaggle/input/competitions/rsna-knee-abnormality-detection`; 4407
+  studies / 24371 series / 58 gold; Report train-only; no PatientID/Laterality
+  in CSVs; StudyInstanceUID folds leakage-safe with 2 rare-label zero-pos
+  fold cells. See `experiments/reports/RSNA-DATA-002.md`.
+- Engineering skeleton (package, configs, metrics, StudyInstanceUID CV,
+  submission validator, Kaggle templates, unit tests): **implemented
+  2026-10-02**.
+- **RSNA-BASELINE-001 imaging pipeline: READY** (2026-10-02) — EfficientNet-B0
+  multi-plane mid-slice 2.5D, gold-only, Kaggle-executable. Real OOF metrics
+  **PENDING_KAGGLE_RUN**. Local synthetic smoke available.
+- **RSNA-LABELS-001 label audit: COMPLETE** (2026-10-02) — regex report→gold
+  soft macro AUC **0.621** [0.574, 0.666]. Strategies B–E **REJECT** for this
+  extractor; A **KEEP**. Next: **RSNA-LABELS-002** (stronger offline labels).
+- Biggest current bottleneck: label quality for silver supervision; imaging
+  baseline GPU run still needed for the floor number.
 
-## Portfolio Dashboard
+---
+
+## Historical snapshot (2026-08-20) — retained
+
+> Last verified: 2026-08-20
+>
+> - Portfolio objective: maximize outcome per unit of time across RSNA, Phoenix,
+>   agent capability, and near-term revenue.
+> - Control-plane repo: `MRI/MRI`, Git `main`, initial commit only, clean at audit
+>   start.
+> - Primary execution repos: `SARASA_kaggle` and `phonix`; they are separate Git
+>   worktrees and are not currently wired into this repo.
+> - Biggest bottleneck: the RSNA repo has no verified knee dataset manifest,
+>   DICOM acquisition index, or executable imaging baseline. The central repo is
+>   also only a control plane, not a model implementation.
+
+**Reconciliation notes (2026-10-02):**
+
+1. `SARASA_kaggle` was inspected and is a **heart-disease tabular** project —
+   not RSNA knee. Do not treat it as the RSNA implementation home.
+2. RSNA skeleton is co-located here per **D-006**.
+3. Bulk DICOM acquisition to Mac remains **forbidden** (D-003 amendment); G1
+   replaced “selective local DICOM download” with Kaggle-mounted compute.
+4. Security finding on plaintext Anthropic credentials in Claude settings
+   remains open from the 2026-08-20 audit (not modified in this change).
+
+## Portfolio Dashboard (updated 2026-10-02)
 
 | Project | Status | Priority | Current phase | Verified latest result | Blocker | Next owner/action |
 |---|---|---:|---|---|---|---|
-| RSNA knee | ACTIVE | P0 | Data/competition discovery | No local knee implementation found; `SARASA_kaggle` is a heart-disease tabular repo, not RSNA knee | Competition identity/deadline, access, metadata, DICOM path, compute/storage budget | Human + Data Agent: confirm official competition and acquire metadata only |
-| Revenue engine | ACTIVE | P0/P1 | Offer validation | No customer, offer, or paid pilot evidence in audited repos | No ICP, proof asset, outreach list, or pricing test | Human + Business Agent: sell a 7-day Agent Reliability Sprint |
-| Agent ecosystem | ACTIVE | P1 | Capability inventory | Local Codex/Claude configuration exists; no governed shared agent architecture | Security boundary, routing policy, eval harness, secret handling | Coding Agent: create least-privilege operating contract |
-| Phoenix | ACTIVE | P1/P2 | Training-core reliability | Dataset v1.1.0 certified: 4,011 images, 0 retained duplicate leakage; best recorded full-split QWK 0.64814, accuracy 0.196995; severe 0->1 collapse remains | External datasets missing; authoritative follow-up control run and clinical metrics incomplete | Experiment Agent: run the documented single-arm control replication |
-| retinopasy | MAINTENANCE | P2 | Safety refactor | Local worktree has staged safety changes, not part of this audit | Must complete ordered regression evidence before live use | Human approval + Coding Agent |
-| PreVisit / other apps | PAUSED | P3 | Separate product work | Existing repos found outside current control plane | Context switching and no current revenue link | Do not allocate weekly focus this cycle |
+| RSNA knee | ACTIVE | P0 | G2 baseline ready; awaiting Kaggle GPU run | Pipeline + synthetic smoke; OOF pending | Run `02_train_baseline` on Kaggle; pull metrics only | Human + agent: upload Dataset, Save Version |
+| Revenue engine | ACTIVE | P1 | Offer validation | Unchanged from 2026-08-20 | ICP / outreach | Human + Business Agent |
+| Agent ecosystem | ACTIVE | P2 | Capability inventory | Unchanged | Security boundary | Defer unless blocking RSNA |
+| Phoenix | ACTIVE | P2 | Training-core reliability | Unchanged | External datasets / clinical metrics | After RSNA G2 or parallel only if spare capacity |
 
-## Verified Environment
+## Verified Environment (2026-10-02 delta)
 
-- Python 3.11.7, Kaggle CLI, Docker, GitHub CLI, and `jq` are installed.
-- DVC, Git LFS, `uv`, and Conda are absent.
-- Available disk is approximately 148 GiB. Do not plan bulk DICOM acquisition
-  until a size estimate and selective-download strategy pass review.
-- Live Kaggle/GitHub API checks were blocked by DNS in this environment; current
-  online competition status and leaderboard are therefore **unverified**.
+- Competition: notebooks-only, internet OFF at submit, GPU/CPU ≤9h, metric =
+  macro ROC-AUC over 12 labels (**VERIFIED**).
+- Local account GPU quota was 30h at G1 probe time (**VERIFIED** then; re-check
+  before training).
+- Package: `src/rsna_knee`, Python ≥3.11, pytest suite for metrics/splits/
+  submission/runtime.
 
-## Security Findings
-
-The workspace Claude settings contain plaintext Anthropic credentials, are
-world-readable (`0644`), and set `defaultMode` to `bypassPermissions`. This is a
-P0 security issue. Rotate/revoke the exposed key, remove credentials from files,
-use the OS keychain or environment injection, and restore approval-based
-execution before enabling autonomous agents. This audit did not modify those
-files.
-
-## STOP / CONTINUE / START
+## STOP / CONTINUE / START (2026-10-02)
 
 ### Stop
 
-- Stop treating the empty `MRI` repo as an implemented RSNA system.
-- Stop broad tool/repository discovery without a concrete decision or output.
-- Stop any bulk DICOM download before manifest, quota, storage, and resume tests.
-- Stop calling Phoenix successful based on QWK alone while grade-0 collapse and
-  clinical metrics remain unresolved.
+- Stop any plan to download full `train_series/` to the Mac.
+- Stop modeling work that requires Report at inference.
+- Stop treating `SARASA_kaggle` as the RSNA knee codebase.
 
 ### Continue
 
-- Continue RSNA as the P0 opportunity, but make data acquisition the first gate.
-- Continue Phoenix from its documented control experiment, preserving frozen
-  v1.1.0 artifacts.
-- Continue revenue work in parallel; long research-only periods are not allowed.
+- Continue Mac control / Kaggle compute architecture from G1.
+- Continue experiment-card discipline (D-004/D-006 fields).
 
 ### Start
 
-- Start one portfolio-level daily status/decision log in this repo.
-- Start a selective RSNA metadata probe and a dry-run DICOM acquisition planner.
-- Start customer discovery for an Agent Reliability Sprint with a concrete paid
-  pilot target.
+- Start Kaggle GPU run of `RSNA-BASELINE-001` (`notebooks/kaggle/02_train_baseline.ipynb`).
+- Start packing this repo as a private Kaggle Dataset for notebook import.
+- After metrics land: start RSNA-LABELS-001 (report→pseudo-labels, training-time only).
 
 ## Missing Information That Changes Decisions
 
-1. Official RSNA competition slug, rules, deadline, and current leaderboard.
-2. Accessible competition metadata/sample files and exact API response shape.
-3. RSNA compute allocation (Kaggle/Colab/local) and acceptable storage budget.
-4. Phoenix BASELINE-001-R full authoritative metric artifact, including the
-   requested clinical metric set and class-wise confusion details.
-5. Revenue ICP, existing warm network, geographic constraints, and minimum
-   acceptable first contract value.
-
+1. ~~Exact live Notebook mount path~~ — **CLOSED** by RSNA-DATA-002:
+   `/kaggle/input/competitions/rsna-knee-abnormality-detection`.
+2. ~~Authoritative gold-label count / prevalence~~ — **CLOSED**: 58 gold;
+   see `outputs/RSNA-DATA-002/label_coverage.csv`.
+3. Whether DICOM headers expose PatientID / Laterality usable for CV/aug
+   (CSV: absent; headers still UNKNOWN).
+4. Train DICOM total bytes (community ~570GB inferred only).
+5. GPU SKU/RAM on Kaggle image for this account.

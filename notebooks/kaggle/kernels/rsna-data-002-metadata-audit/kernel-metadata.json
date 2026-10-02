@@ -1,0 +1,15 @@
+{
+  "id": "alikarimiansarasa/rsna-data-002-metadata-audit-g1b",
+  "title": "rsna-data-002-metadata-audit-g1b",
+  "code_file": "rsna-data-002-metadata-audit.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "false",
+  "dataset_sources": [],
+  "competition_sources": ["rsna-knee-abnormality-detection"],
+  "kernel_sources": [],
+  "model_sources": []
+}

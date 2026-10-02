@@ -1,0 +1,3 @@
+name: ConstantPriorModel
+# Placeholder — real imaging backbones land after G2 gate.
+description: metadata-only prevalence prior for platform smoke tests

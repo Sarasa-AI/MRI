@@ -1,0 +1,12 @@
+# Pinned for Apple Silicon / local metadata-only development.
+# Training/inference with CUDA GPUs happens on Kaggle, not this Mac.
+
+numpy>=1.26,<3
+pandas>=2.1,<3
+scikit-learn>=1.3,<2
+PyYAML>=6.0,<7
+pytest>=7.4,<9
+
+# Optional local smoke (imaging loop on synthetic tensors):
+#   pip install torch torchvision
+# Kaggle runtime additionally needs: pydicom, pylibjpeg, python-gdcm (often preinstalled)

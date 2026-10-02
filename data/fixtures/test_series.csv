@@ -1,0 +1,4 @@
+StudyInstanceUID,SeriesInstanceUID,Fluid_Sensitive,Fat_Suppression,Anatomical_Plane
+test_0000,test_0000_series_0,1,1,Sagittal
+test_0001,test_0001_series_0,1,1,Sagittal
+test_0002,test_0002_series_0,1,1,Sagittal

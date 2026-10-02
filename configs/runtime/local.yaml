@@ -1,0 +1,6 @@
+mode: metadata_only
+# Local Mac: fixtures / unit tests only. No competition DICOMs.
+data_root: null
+fixtures_dir: data/fixtures
+working_dir: outputs
+allow_missing_dicom: true

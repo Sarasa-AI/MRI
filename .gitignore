@@ -8,13 +8,27 @@ __pycache__/
 .ruff_cache/
 .venv/
 venv/
+*.egg-info/
+dist/
+build/
+
+# Competition data must never be committed
 data/raw/
 data/processed/
-artifacts/
-outputs/
-checkpoints/
 *.dcm
 *.zip
 *.tar
 *.tar.gz
 
+# Generated run artifacts
+artifacts/
+outputs/
+checkpoints/
+experiments/results/*.csv
+experiments/cards/*.json
+
+# Keep fixtures (synthetic only)
+!data/fixtures/
+!data/fixtures/**
+!experiments/results/.gitkeep
+!experiments/cards/.gitkeep

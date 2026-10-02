@@ -1,0 +1,24 @@
+defaults:
+  - runtime: local
+  - model: stub
+  - data: default
+
+experiment_id: EXP-000-smoke
+seed: 42
+n_folds: 5
+input_geometry: metadata_only
+data_selection: gold_labels_only
+labels: official_12_targets
+folds: GroupKFold_by_StudyInstanceUID
+augmentation: none
+optimizer: none
+scheduler: none
+metric: macro_roc_auc
+runtime_note: local_metadata_only
+hypothesis: >
+  The control-plane package can load fixtures, build leakage-safe study
+  folds, score macro/per-label AUC, write OOF + experiment cards, and
+  validate submissions without any competition DICOMs.
+pass_fail: >
+  All unit tests pass; smoke run writes OOF + experiment_card.json;
+  submission validator accepts uniform-0.5 fixture submission.

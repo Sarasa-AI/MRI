@@ -1,0 +1,15 @@
+{
+  "id": "alikarimiansarasa/rsna-baseline-001-pilot",
+  "title": "rsna-baseline-001-pilot",
+  "code_file": "rsna-baseline-001-pilot.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_tpu": "false",
+  "enable_internet": "true",
+  "dataset_sources": ["alikarimiansarasa/rsna-knee-control"],
+  "competition_sources": ["rsna-knee-abnormality-detection"],
+  "kernel_sources": [],
+  "model_sources": []
+}
