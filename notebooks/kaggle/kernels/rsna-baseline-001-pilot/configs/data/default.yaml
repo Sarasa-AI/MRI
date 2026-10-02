@@ -1,0 +1,5 @@
+selection: gold_labels_only
+# Official CSVs expose StudyInstanceUID only (no PatientID).
+group_col: StudyInstanceUID
+label_columns: null  # defaults to official 12 targets
+require_report_at_inference: false

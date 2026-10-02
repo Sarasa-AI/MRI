@@ -1,0 +1,79 @@
+# RSNA-BASELINE-001 — first competitive imaging floor (Kaggle GPU only).
+#
+# Hypothesis: A single EfficientNet-B0 multi-plane mid-slice 2.5D model
+# trained on the 58 gold-labeled studies with StudyInstanceUID 5-fold CV
+# establishes a trustworthy OOF macro-AUC floor that later experiments
+# must beat on the same protocol.
+#
+# Pass/fail: leakage assertions green; OOF + per-label + fold metrics +
+# submission artifacts written; wall-clock fits Kaggle GPU ≤9h.
+#
+# Explicitly OUT OF SCOPE for this run:
+#   - report / LLM / regex pseudo-labels
+#   - ensembles beyond fold OOF aggregation for submission
+#   - hyperparameter search
+#   - full 3D / GNN / CLIP / MAE
+
+experiment_id: RSNA-BASELINE-001
+seed: 42
+n_folds: 5
+# With only ~58 gold studies, 5-fold is still preferred (≈11–12 val/fold).
+# Set pilot_folds: 1 to validate I/O+train before burning full CV quota.
+pilot_folds: null
+
+runtime:
+  mode: kaggle
+  device: auto  # cuda > mps > cpu; Mac must not load competition DICOMs
+
+data:
+  selection: gold_labels_only
+  group_col: StudyInstanceUID
+  # Prefer fluid-sensitive series; one mid-slice per anatomical plane.
+  series_policy: fluid_sensitive_one_per_plane
+  planes: [Sagittal, Coronal, Axial]
+  prefer_fat_suppression: true
+  image_size: 224
+  # Mid-slice index fraction within sorted InstanceNumber order.
+  mid_slice_frac: 0.5
+  cache_dirname: cache_midplane_224
+  num_workers: 2
+
+model:
+  name: EfficientNetB0MultiPlane25D
+  backbone: efficientnet_b0
+  pretrained: true
+  dropout: 0.2
+  in_channels: 3
+  num_classes: 12
+
+augmentation:
+  horizontal_flip: allow_with_compartment_swap
+  hflip_p: 0.5
+  rotate_deg: 10
+  brightness: 0.15
+  contrast: 0.15
+  # Mild scale jitter only — avoid aggressive crops that erase anatomy.
+  scale_min: 0.90
+  scale_max: 1.00
+
+train:
+  epochs: 25
+  batch_size: 8
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: adamw
+  scheduler: cosine
+  loss: bce_with_logits
+  amp: true
+  grad_clip: 1.0
+  # Small gold set: early stop on fold val macro-AUC.
+  early_stopping_patience: 8
+
+inference:
+  # Mean of fold checkpoint sigmoid probs (simple, not a searched ensemble).
+  aggregate: mean_folds
+  batch_size: 8
+
+metric: macro_roc_auc
+labels: official_12_targets
+report_at_inference: false

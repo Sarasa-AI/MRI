@@ -1,0 +1,7 @@
+mode: kaggle
+# Resolved dynamically by rsna_knee.runtime.adapter.discover_kaggle_root().
+# Do not hard-code alternate mount paths in training code.
+data_root: null
+working_dir: /kaggle/working
+allow_missing_dicom: false
+competition_slug: rsna-knee-abnormality-detection

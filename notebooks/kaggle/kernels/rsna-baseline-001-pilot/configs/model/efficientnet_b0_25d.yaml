@@ -1,0 +1,10 @@
+name: EfficientNetB0MultiPlane25D
+backbone: efficientnet_b0
+pretrained: true
+dropout: 0.2
+in_channels: 3
+num_classes: 12
+description: >
+  Study-level multi-label head on ImageNet-pretrained EfficientNet-B0.
+  Input is a 3-channel multi-plane mid-slice stack (Sagittal/Coronal/Axial).
+  Vision-only at inference — no report pathway.
